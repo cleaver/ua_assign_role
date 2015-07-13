@@ -25,9 +25,12 @@ function ua_assign_role_admin() {
     '#default_value' => implode("\n", variable_get('ua_assign_role_subnets')),
     '#required' => FALSE,
   );
+  $rid = NULL;
   $role = variable_get('ua_assign_role_role');
-  reset($role);
-  $rid = key($role);
+  if (!empty($role)) {
+    reset($role);
+    $rid = key($role);
+  }
   $form['ua_assign_role_role'] = array(
     '#type' => 'select',
     '#title' => t('Role'),
