@@ -9,8 +9,7 @@
 /**
  * Implements hook_permission().
  */
-function ua_assign_role_permission()
-{
+function ua_assign_role_permission() {
   return array(
     'administer ua_assign_role' => array(
       'title' => t('Administer User-agent Assign Role'),
@@ -23,8 +22,7 @@ function ua_assign_role_permission()
 /**
  * Implements hook_menu().
  */
-function ua_assign_role_menu()
-{
+function ua_assign_role_menu() {
   $items['admin/config/development/ua-assign-role'] = array(
     'title' => 'User-agent Assign Role',
     'description' => 'Settings for User-agent Assign Role',
@@ -40,15 +38,13 @@ function ua_assign_role_menu()
 /**
  * Implements hook_boot().
  */
-function ua_assign_role_boot()
-{
+function ua_assign_role_boot() {
   global $user;
   // check user agent
   if ( !$user->uid == 0
     || !_ua_assign_role_check_agent()) {
     return;
   }
-
   $new_role = variable_get('ua_assign_role_role');
   if (sizeof($new_role) == 1){
     $user->roles += $new_role;
@@ -62,8 +58,7 @@ function ua_assign_role_boot()
  * @return bool
  *    TRUE if matches.
  */
-function _ua_assign_role_check_agent()
-{
+function _ua_assign_role_check_agent() {
   foreach (variable_get('ua_assign_role_user_agents') as $agent) {
     $agent_substr = substr($_SERVER['HTTP_USER_AGENT'], 0, strlen($agent));
     if ($agent == $agent_substr) {
@@ -107,6 +102,18 @@ function _ua_assign_role_in_cidr($ip, $cidr) {
   return $cidr_binary == $ip_binary;
 }
 
+/**
+ * Convert an IP address to string binary.
+ *
+ * @param string $addr
+ *    The IP address as a string.
+ * @param integer $truncate
+ *    Number of bits to return.
+ * @param integer $version
+ *    4 for IPV4 or 6 for IPV6.
+ * @return string
+ *    IP address in binary form as a string.
+ */
 function _ua_assign_role_ip_to_binary($addr, $truncate, $version) {
   if ($version == 6) {
     $base = 16;
