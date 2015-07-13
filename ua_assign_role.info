@@ -1,0 +1,6 @@
+name = User-agent Assign Role
+description = Assign a role based on HTTP_USER_AGENT
+configure = admin/config/development/ua-assign-role
+core = 7.x
+package = Other
+
