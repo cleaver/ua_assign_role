@@ -88,7 +88,11 @@ function _ua_assign_role_check_agent() {
  *   TRUE if in subnet.
  */
 function _ua_assign_role_check_subnet() {
-  foreach (variable_get('ua_assign_role_subnets') as $subnet) {
+  $subnet_list =variable_get('ua_assign_role_subnets');
+  if (empty($subnet_list)) {
+    return TRUE;
+  }
+  foreach ($subnet_list as $subnet) {
     if (_ua_assign_role_in_cidr($_SERVER['REMOTE_ADDR'], $subnet)) {
       return TRUE;
     }
@@ -107,7 +111,7 @@ function _ua_assign_role_check_subnet() {
  *    True if $ip is in $cidr
  */
 function _ua_assign_role_in_cidr($ip, $cidr) {
-  if (strpos($ip, ':')) {
+  if (false !== strpos($ip, ':')) {
     // ipv6
     $pattern = '/([\da-f:]+)\/(\d+)/i';
     $max_length = 128;
