@@ -14,6 +14,7 @@ function ua_assign_role_install() {
   variable_set('ua_assign_role_user_agents', array('facebookexternalhit/1.1', 'Facebot'));
   variable_set('ua_assign_role_subnets', array('192.168.1.0/24', 'FD12:3456:789A:BCDE::/64'));
   variable_set('ua_assign_role_role', NULL);
+  variable_set('ua_assign_role_nocache', FALSE);
 }
 
 /**
@@ -24,4 +25,5 @@ function ua_assign_role_uninstall() {
   variable_del('ua_assign_role_user_agents');
   variable_del('ua_assign_role_subnets');
   variable_del('ua_assign_role_role');
+  variable_del('ua_assign_role_nocache');
 }
