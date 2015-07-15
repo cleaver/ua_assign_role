@@ -25,3 +25,4 @@ Limitations
 This module only allows a single assignment of a role. It will not assign one role to User-agent "A"
 and a different role to User-agent "B".
 
+Other modules may redirect for user 0, overriding this module.

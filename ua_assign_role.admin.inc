@@ -41,6 +41,12 @@ function ua_assign_role_admin() {
     '#options' => user_roles(TRUE),
     '#required' => TRUE,
   );
+  $form['ua_assign_role_nocache'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Don't cache"),
+    '#description' => t('Avoid using cache for the result. You probably want to check this if page caching is turned on.'),
+    '#default_value' => variable_get('ua_assign_role_nocache', FALSE),
+  );
   return system_settings_form($form);
 }
 

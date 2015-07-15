@@ -42,13 +42,26 @@ function ua_assign_role_boot() {
   global $user;
   // check user agent
   if ( !$user->uid == 0
-    || !_ua_assign_role_check_agent()) {
+    || !_ua_assign_role_check_agent()
+    || !_ua_assign_role_check_subnet())
+  {
     return;
   }
   $new_role = variable_get('ua_assign_role_role');
   if (sizeof($new_role) == 1){
     $user->roles += $new_role;
   }
+  if ( variable_get('cache', TRUE)
+    && variable_get('ua_assign_role_nocache', FALSE)) {
+    header('X-Drupal-Cache: MISS');
+    ob_start();
+    // Continue bootstrap
+    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    // Execute the page callback and exit.
+    menu_execute_active_handler();
+    exit;
+  }
+
 }
 
 
@@ -69,6 +82,23 @@ function _ua_assign_role_check_agent() {
 }
 
 /**
+ * Checks user IP against predefined list of IPs.
+ *
+ * @return bool
+ *   TRUE if in subnet.
+ */
+function _ua_assign_role_check_subnet() {
+  foreach (variable_get('ua_assign_role_subnets') as $subnet) {
+    if (_ua_assign_role_in_cidr($_SERVER['REMOTE_ADDR'], $subnet)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Check if an IP is within a specified subnet. Works for IPV4 and IPV6.
+ *
  * @param $ip string
  *    IP address to check - assumes valid
  * @param $cidr string
@@ -97,37 +127,27 @@ function _ua_assign_role_in_cidr($ip, $cidr) {
   if (!is_numeric($subnet) || $subnet > $max_length || $subnet < 0) {
     return false;
   }
-  $cidr_binary = _ua_assign_role_ip_to_binary($addr, $subnet, $version);
-  $ip_binary = _ua_assign_role_ip_to_binary($ip, $subnet, $version);
+  $cidr_binary = _ua_assign_role_ip_to_binary($addr, $subnet);
+  $ip_binary = _ua_assign_role_ip_to_binary($ip, $subnet);
   return $cidr_binary == $ip_binary;
 }
 
 /**
- * Convert an IP address to string binary.
+ * Convert an IP address to string binary. Works for IPV4 and IPV6.
  *
  * @param string $addr
  *    The IP address as a string.
  * @param integer $truncate
  *    Number of bits to return.
- * @param integer $version
- *    4 for IPV4 or 6 for IPV6.
  * @return string
  *    IP address in binary form as a string.
  */
-function _ua_assign_role_ip_to_binary($addr, $truncate, $version) {
-  if ($version == 6) {
-    $base = 16;
-    $size = 16;
-    $delimiter = ':';
-  }
-  else {
-    $base = 10;
-    $size = 8;
-    $delimiter = '.';
-  }
-  $to_binary_func = function ($carry, $item) use ($base, $size) {
-    return $carry . str_pad(base_convert($item, $base, 2), $size, '0', STR_PAD_LEFT);
+function _ua_assign_role_ip_to_binary($addr, $truncate) {
+  $hex_addr = array_shift(unpack('H*',inet_pton($addr)));
+  $split_hex = str_split($hex_addr, 4);
+  $to_binary_func = function ($carry, $item) {
+    return $carry . str_pad(base_convert($item, 16, 2), 16, '0', STR_PAD_LEFT);
   };
-  $binary_addr = substr(array_reduce(explode($delimiter, $addr), $to_binary_func), 0, $truncate);
+  $binary_addr = substr(array_reduce($split_hex, $to_binary_func), 0, $truncate);
   return $binary_addr;
 }
