@@ -85,6 +85,14 @@ function _ua_assign_role_admin_explode_trim($value) {
   return array_filter($values);
 }
 
+/**
+ * Validate a subnet. Works for IPV4 and IPV6.
+ *
+ * @param string $subnet
+ *    the subnet to validate
+ * @return bool
+ *    TRUE if the subnet is valid, otherwise FALSE.
+ */
 function _ua_assign_role_validate_subnet($subnet) {
   if (preg_match('/([\d\.:]+)\/(\d+)/', $subnet, $matches)) {
     $ip = $matches[1];
