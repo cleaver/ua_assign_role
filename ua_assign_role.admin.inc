@@ -56,6 +56,12 @@ function ua_assign_role_admin() {
 function ua_assign_role_admin_validate($form, &$form_state) {
   $form_state['values']['ua_assign_role_user_agents'] = _ua_assign_role_admin_explode_trim($form_state['values']['ua_assign_role_user_agents']);
   $form_state['values']['ua_assign_role_subnets'] = _ua_assign_role_admin_explode_trim($form_state['values']['ua_assign_role_subnets']);
+  foreach ($form_state['values']['ua_assign_role_subnets'] as $subnet) {
+    if (!_ua_assign_role_validate_subnet($subnet)) {
+      form_set_error('ua_assign_role_subnets', t('Value "%subnet" is not a valid subnet', array('%subnet' => $subnet)));
+      break;
+    }
+  }
   $rid = $form_state['values']['ua_assign_role_role'];
   $roles = user_roles();
   $form_state['values']['ua_assign_role_role'] = array(
@@ -77,4 +83,12 @@ function _ua_assign_role_admin_explode_trim($value) {
     $item = trim($item);
   });
   return array_filter($values);
+}
+
+function _ua_assign_role_validate_subnet($subnet) {
+  if (preg_match('/([\d\.:]+)\/(\d+)/', $subnet, $matches)) {
+    $ip = $matches[1];
+    return (false !== inet_pton($ip));
+  }
+  return FALSE;
 }

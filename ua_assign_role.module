@@ -115,13 +115,11 @@ function _ua_assign_role_in_cidr($ip, $cidr) {
     // ipv6
     $pattern = '/([\da-f:]+)\/(\d+)/i';
     $max_length = 128;
-    $version = 6;
   }
   else {
     // ipv4
     $pattern = '/([\d\.]+)\/(\d+)/';
     $max_length = 32;
-    $version = 4;
   }
   preg_match($pattern, $cidr, $match);
   if (empty($match)) {
