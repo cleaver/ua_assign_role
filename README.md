@@ -1,7 +1,7 @@
 User-agent Assign Role
 ======================
 
-This module will assign a role to an anonymous or authenticated user if the HTTP_USER_AGENT is one
+This module will assign a role to an anonymous if the HTTP_USER_AGENT is one
 of a specified set of values.
 
 
